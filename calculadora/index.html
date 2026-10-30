@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Calculadora do Leilão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f4ec;--surface:#fff;--fg:#14231c;--muted:#5d6b63;--line:#ddd6c4;--verde:#0d2e22;--verde2:#143a2c;--dourado:#d2ae52;--dourado2:#a8863a;
+  --good:#1a7f4b;--good-soft:#e3f4ea;--warn:#a35a00;--warn-soft:#fbefdc;--bad:#b3261e;--bad-soft:#fbe6e4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,Arial,sans-serif;font-size:15px;line-height:1.5;padding:0 0 40px}
+.top{background:var(--verde);color:#f7f4ec;padding:26px 16px 22px}
+.top .in{max-width:1000px;margin:0 auto}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dourado);font-weight:800}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.05;margin:6px 0 8px;font-weight:900}
+h1 span{color:var(--dourado)}
+.top p{margin:0;color:#c9d4cd;max-width:64ch}
+.wrap{max-width:1000px;margin:22px auto 0;padding:0 16px;display:grid;gap:22px}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:18px;min-width:0}
+.panel h2{font-size:20px;margin:0;font-weight:900}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:12px}
+legend{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dourado2);font-weight:800;margin-bottom:4px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:12px;align-items:center}
+.row label{font-size:14px;font-weight:700}
+.row small{display:block;color:var(--muted);font-size:12px;font-weight:400;line-height:1.4}
+.row small b{color:var(--verde)}
+.field{display:flex;align-items:center;border:1px solid var(--line);border-radius:9px;background:var(--bg)}
+.field span{padding:0 8px;color:var(--muted);font-size:13px}
+.field input{width:100%;min-width:0;border:0;background:transparent;color:var(--fg);font:700 15px Inter,Arial,sans-serif;padding:9px 8px;text-align:right;font-variant-numeric:tabular-nums}
+.field:focus-within{border-color:var(--verde);outline:2px solid rgba(210,174,82,.4)}
+.field input:focus{outline:none}
+.result{position:sticky;top:16px}
+.hero{background:var(--verde);color:#f7f4ec;border-radius:12px;padding:16px}
+.hero .lbl{font-size:13px;color:#c9d4cd}
+.hero .val{font-size:40px;font-weight:900;line-height:1.05;color:var(--dourado);font-variant-numeric:tabular-nums}
+.hero .sm{font-size:13px;color:#c9d4cd;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+td{padding:6px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;white-space:nowrap}
+tr.total td{font-weight:900;border-bottom:0;padding-top:9px}
+.box{border-radius:12px;padding:14px;display:grid;gap:4px}
+.box.resale{background:var(--good-soft)}
+.box.resale .val{font-size:26px;font-weight:900;color:var(--good);font-variant-numeric:tabular-nums}
+.box.max{background:#fbf6e6;border:1px solid #ecdcae}
+.box.max .val{font-size:24px;font-weight:900;color:var(--verde);font-variant-numeric:tabular-nums}
+.box .lbl{font-size:13px;color:var(--muted);font-weight:600}
+.verdict{padding:9px 12px;border-radius:9px;font-weight:700;font-size:13.5px}
+.verdict.good{background:var(--good-soft);color:var(--good)}
+.verdict.warn{background:var(--warn-soft);color:var(--warn)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.bar{height:12px;border-radius:6px;background:var(--line);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.note{font-size:12px;color:var(--muted);margin:0}
+button{font:700 14px Inter,Arial,sans-serif;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:9px;padding:9px 14px;cursor:pointer}
+button:hover{border-color:var(--verde)}
+footer{font-size:13px;color:var(--muted);display:grid;gap:4px}
+footer strong{color:var(--fg)}
+footer a{color:var(--verde);font-weight:700}
+.dock{display:none}
+@media (max-width:780px){
+  .dock{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--verde);color:#f7f4ec;padding:10px 16px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -4px 14px rgba(0,0,0,.2)}
+  .dock .l{font-size:12px;color:#c9d4cd}.dock .v{font-size:20px;font-weight:900;color:var(--dourado);font-variant-numeric:tabular-nums}
+  .dock a{background:var(--dourado);color:var(--verde);text-decoration:none;font-weight:800;font-size:13px;border-radius:9px;padding:8px 12px;white-space:nowrap}
+  body{padding-bottom:84px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="in">
+  <div class="eyebrow">Bônus do e-book Imóveis de Leilão Sem Medo</div>
+  <h1>Calculadora do <span>leilão</span></h1>
+  <p>Coloque quanto o imóvel vale e por quanto foi arrematado. A calculadora soma todos os gastos e mostra a sua economia, o lucro se você revender e o seu lance máximo. O exemplo já preenchido é um imóvel de R$ 300 mil arrematado pela metade; troque pelos números do seu.</p>
+</div></div>
+
+<div class="wrap">
+  <div class="grid">
+    <form class="panel" id="form" novalidate>
+      <fieldset>
+        <legend>1 · O imóvel</legend>
+        <div class="row"><label for="mercado">Quanto o imóvel vale<small>Valor de mercado: média de imóveis parecidos na região</small></label><div class="field"><span>R$</span><input id="mercado" inputmode="decimal" value="300.000"></div></div>
+        <div class="row"><label for="lance">Por quanto foi arrematado<small id="h-lance">Valor do lance vencedor</small></label><div class="field"><span>R$</span><input id="lance" inputmode="decimal" value="150.000"></div></div>
+      </fieldset>
+      <fieldset>
+        <legend>2 · Os gastos</legend>
+        <div class="row"><label for="comissao">Comissão do leiloeiro<small id="h-comissao">5% sobre o lance, paga direto ao leiloeiro. Na venda direta com o banco, coloque 0</small></label><div class="field"><input id="comissao" inputmode="decimal" value="5"><span>%</span></div></div>
+        <div class="row"><label for="itbi">ITBI<small id="h-itbi">Em Curitiba (PR), 2,7% sobre o valor arrematado. Outra cidade? Troque a alíquota</small></label><div class="field"><input id="itbi" inputmode="decimal" value="2,7"><span>%</span></div></div>
+        <div class="row"><label for="cartorio">Cartório<small id="h-cartorio">Escritura, registro, certidões e tabelionato, tudo junto: 4% do valor do imóvel</small></label><div class="field"><input id="cartorio" inputmode="decimal" value="4"><span>%</span></div></div>
+        <div class="row"><label for="dividas">IPTU e condomínio<small>Só se houver débitos que fiquem com você. Na Caixa, até 10% da avaliação; confira o edital</small></label><div class="field"><span>R$</span><input id="dividas" inputmode="decimal" value="0"></div></div>
+        <div class="row"><label for="desocupacao">Desocupação<small>Em média de R$ 500 a R$ 3.200: o frete do caminhão de mudança e de 1 a 3 meses de aluguel para o morador sair</small></label><div class="field"><span>R$</span><input id="desocupacao" inputmode="decimal" value="3.200"></div></div>
+        <div class="row"><label for="reforma">Reforma<small id="h-reforma">Em média 10% do valor arrematado</small></label><div class="field"><input id="reforma" inputmode="decimal" value="10"><span>%</span></div></div>
+      </fieldset>
+      <fieldset>
+        <legend>3 · Se for revender</legend>
+        <div class="row"><label for="corretagem">Corretagem na venda<small>Comissão da imobiliária que vende</small></label><div class="field"><input id="corretagem" inputmode="decimal" value="6"><span>%</span></div></div>
+        <div class="row"><label for="ir">Imposto sobre o lucro<small>15% sobre o ganho; há casos de isenção</small></label><div class="field"><input id="ir" inputmode="decimal" value="15"><span>%</span></div></div>
+      </fieldset>
+      <fieldset>
+        <legend>4 · A sua meta</legend>
+        <div class="row"><label for="meta">Economia mínima que você quer<small>Usada para calcular o seu lance máximo</small></label><div class="field"><input id="meta" inputmode="decimal" value="20"><span>%</span></div></div>
+      </fieldset>
+      <div><button type="button" id="reset">Voltar ao exemplo</button></div>
+    </form>
+
+    <section class="panel result" id="resultado" aria-live="polite">
+      <div class="hero"><div class="lbl">A sua economia na compra</div><div class="val" id="eco">R$ 0</div><div class="sm" id="eco-sm"></div></div>
+      <table>
+        <tr><td>Valor arrematado</td><td id="r-lance"></td></tr>
+        <tr><td>Comissão do leiloeiro</td><td id="r-comissao"></td></tr>
+        <tr><td>ITBI</td><td id="r-itbi"></td></tr>
+        <tr><td>Cartório</td><td id="r-cartorio"></td></tr>
+        <tr><td>IPTU e condomínio</td><td id="r-dividas"></td></tr>
+        <tr><td>Desocupação</td><td id="r-desocupacao"></td></tr>
+        <tr><td>Reforma</td><td id="r-reforma"></td></tr>
+        <tr class="total"><td>Custo total do imóvel</td><td id="r-total"></td></tr>
+      </table>
+      <div class="bar" aria-hidden="true"><i id="b1" style="background:var(--verde)"></i><i id="b2" style="background:var(--dourado)"></i><i id="b3" style="background:var(--good)"></i></div>
+      <div class="legend"><span><b style="background:var(--verde)"></b>Lance</span><span><b style="background:var(--dourado)"></b>Gastos</span><span><b style="background:var(--good)"></b>Economia</span></div>
+      <div class="box resale"><span class="lbl">Se revender pelo valor de mercado, o seu lucro líquido</span><span class="val" id="lucro">R$ 0</span><span class="note" id="lucro-sm"></span></div>
+      <div class="box max"><span class="lbl" id="max-lbl">O seu lance máximo</span><span class="val" id="max">R$ 0</span></div>
+      <div class="verdict" id="verdict">—</div>
+      <p class="note">Estimativa para planejamento. Confirme os valores no edital, na prefeitura, no cartório e com um advogado. Nenhum resultado é garantido.</p>
+    </section>
+  </div>
+
+  <footer>
+    <strong>Danilo Rodrigues · Libarino Imóveis · CRECI-PR J11081</strong>
+    <span>Quer essa conta feita no imóvel que você está de olho? <a href="https://wa.me/5541984456306?text=Ol%C3%A1%2C%20Danilo!%20Usei%20a%20calculadora%20e%20quero%20ajuda%20com%20um%20im%C3%B3vel%20de%20leil%C3%A3o." target="_blank" rel="noopener">Fale comigo no WhatsApp</a></span>
+    <span>© 2026 Danilo Rodrigues. Todos os direitos reservados.</span>
+  </footer>
+</div>
+
+<div class="dock"><div><div class="l">A sua economia na compra</div><div class="v" id="dock-eco">R$ 0</div></div><a href="#resultado">Ver resultado</a></div>
+<script>
+const ids=["mercado","lance","comissao","itbi","cartorio","dividas","desocupacao","reforma","corretagem","ir","meta"];
+const defaults={};const $=id=>document.getElementById(id);
+ids.forEach(id=>defaults[id]=$(id).value);
+const num=v=>{const s=String(v).replace(/\./g,"").replace(",",".").replace(/[^\d.\-]/g,"");const n=parseFloat(s);return isFinite(n)?n:0};
+const brl=n=>(n<0?"− ":"")+"R$ "+Math.round(Math.abs(n)).toLocaleString("pt-BR");
+const pc=n=>n.toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
+function calc(){
+  const v={};ids.forEach(id=>v[id]=num($(id).value));
+  const comissao=v.lance*v.comissao/100, itbi=v.lance*v.itbi/100, cartorio=v.lance*v.cartorio/100, reforma=v.lance*v.reforma/100;
+  const gastos=comissao+itbi+cartorio+v.dividas+v.desocupacao+reforma;
+  const total=v.lance+gastos;
+  const eco=v.mercado-total;
+  $("h-lance").textContent=v.mercado>0?"Valor do lance vencedor: "+pc(v.lance/v.mercado*100)+" do valor de mercado":"Valor do lance vencedor";
+  $("h-reforma").textContent="Em média 10% do valor arrematado: aqui, "+brl(reforma);
+  $("eco").textContent=brl(eco);$("dock-eco").textContent=brl(eco);
+  $("eco-sm").textContent=v.mercado>0?"Você paga "+brl(total)+" num imóvel que vale "+brl(v.mercado)+": "+pc(eco/v.mercado*100)+" abaixo do mercado.":"";
+  $("r-lance").textContent=brl(v.lance);
+  $("r-comissao").textContent=brl(comissao);
+  $("r-itbi").textContent=brl(itbi);
+  $("r-cartorio").textContent=brl(cartorio);
+  $("h-cartorio").textContent="Escritura, registro, certidões e tabelionato, tudo junto: 4% do valor do imóvel. Aqui, "+brl(cartorio);
+  $("r-dividas").textContent=brl(v.dividas);
+  $("r-desocupacao").textContent=brl(v.desocupacao);
+  $("r-reforma").textContent=brl(reforma);
+  $("r-total").textContent=brl(total);
+  const corret=v.mercado*v.corretagem/100;
+  const ganho=v.mercado-corret-total;
+  const imposto=Math.max(ganho,0)*v.ir/100;
+  const lucro=ganho-imposto;
+  $("lucro").textContent=brl(lucro);
+  $("lucro-sm").textContent=total>0?pc(lucro/total*100)+" sobre o que você investiu, já descontados "+brl(corret)+" de corretagem e "+brl(imposto)+" de imposto.":"";
+  const pct=(v.comissao+v.itbi+v.cartorio+v.reforma)/100, fixos=v.dividas+v.desocupacao;
+  const max=Math.max(0,(v.mercado*(1-v.meta/100)-fixos)/(1+pct));
+  $("max-lbl").textContent="O seu lance máximo para economizar pelo menos "+pc(v.meta);
+  $("max").textContent=brl(max);
+  const vd=$("verdict");
+  if(v.mercado<=0){vd.className="verdict warn";vd.textContent="Informe quanto o imóvel vale para calcular."}
+  else if(v.lance<=max){vd.className="verdict good";vd.textContent="O valor arrematado está dentro do seu limite: a conta fecha com folga."}
+  else if(eco>0){vd.className="verdict warn";vd.textContent="Ainda economiza, mas abaixo da sua meta. Reveja o lance ou os gastos."}
+  else{vd.className="verdict bad";vd.textContent="Com esse lance você pagaria mais do que o imóvel vale. Não dê esse lance."}
+  const base=Math.max(v.mercado,total,1);
+  $("b1").style.width=(v.lance/base*100)+"%";
+  $("b2").style.width=(gastos/base*100)+"%";
+  $("b3").style.width=(Math.max(eco,0)/base*100)+"%";
+}
+ids.forEach(id=>$(id).addEventListener("input",calc));
+$("form").addEventListener("submit",e=>e.preventDefault());
+$("reset").addEventListener("click",()=>{ids.forEach(id=>$(id).value=defaults[id]);calc()});
+calc();
+</script>
+</body>
+</html>
